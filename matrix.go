@@ -1,11 +1,16 @@
+// Package matrix implements a simple dense matrix.
 package matrix
 
 import (
+	"errors"
 	"fmt"
 	"math"
-  "bytes"
-  "encoding/binary"
 )
+
+// Contains the Matrix definition and common matrix operations.
+
+var DimensionsError = errors.New("Incorrect dimensions")
+var IndexError = errors.New("Index out of range")
 
 type Matrix struct {
 	elements   []float64
@@ -13,22 +18,15 @@ type Matrix struct {
 }
 
 func (m *Matrix) Arrays() (a [][]float64) {
-  a = make([][]float64, m.rows)
-  for i := 0; i < m.rows; i++ {
-    a[i] = m.elements[i*m.cols:i*m.cols+m.cols]
-  }
-  return
+	a = make([][]float64, m.rows)
+	for i := 0; i < m.rows; i++ {
+		a[i] = m.elements[i*m.cols : i*m.cols+m.cols]
+	}
+	return
 }
 
 func (m *Matrix) Array() []float64 {
-  return m.elements
-}
-
-func (m *Matrix) Bytes() (b []byte, err error) {
-  buf := new(bytes.Buffer)
-	err = binary.Write(buf, binary.LittleEndian, m.elements)
-  b = buf.Bytes()
-  return
+	return m.elements
 }
 
 func (m *Matrix) Rows() int {
@@ -65,14 +63,14 @@ func (m *Matrix) String() string {
 
 func (m *Matrix) Get(row, col int) (float64, error) {
 	if row >= m.rows || col >= m.cols {
-		return 0, new(MatrixIndexError)
+		return 0, IndexError
 	}
 	return m.elements[row*m.cols+col], nil
 }
 
 func (m *Matrix) Set(row, col int, v float64) error {
 	if row >= m.rows || col >= m.cols {
-		return new(MatrixIndexError)
+		return IndexError
 	}
 	m.elements[row*m.cols+col] = v
 	return nil
@@ -80,7 +78,7 @@ func (m *Matrix) Set(row, col int, v float64) error {
 
 func (m *Matrix) SetCol(col int, v float64) error {
 	if col >= m.cols {
-		return new(MatrixIndexError)
+		return IndexError
 	}
 	for i := 0; i < m.rows; i++ {
 		m.elements[i*m.cols+col] = v
@@ -90,7 +88,7 @@ func (m *Matrix) SetCol(col int, v float64) error {
 
 func (m *Matrix) SetRow(row int, v float64) error {
 	if row >= m.rows {
-		return new(MatrixIndexError)
+		return IndexError
 	}
 	for j := 0; j < m.cols; j++ {
 		m.elements[row*m.cols+j] = v
@@ -100,7 +98,7 @@ func (m *Matrix) SetRow(row int, v float64) error {
 
 func (m *Matrix) SetSlice(row, col int, n *Matrix) error {
 	if n.rows+row > m.rows || n.cols+col > m.cols {
-		return new(MatrixIndexError)
+		return IndexError
 	}
 	for i := 0; i < n.rows; i++ {
 		for j := 0; j < n.cols; j++ {
@@ -126,7 +124,7 @@ func (m *Matrix) Sum() float64 {
 
 func (m *Matrix) Add(n *Matrix) error {
 	if m.rows != n.rows || m.cols != n.cols {
-		return new(MatrixDimensionsError)
+		return DimensionsError
 	}
 	for i, x := range n.elements {
 		m.elements[i] += x
@@ -136,7 +134,7 @@ func (m *Matrix) Add(n *Matrix) error {
 
 func (m *Matrix) Sub(n *Matrix) error {
 	if m.cols != n.cols || m.rows != n.rows {
-		return new(MatrixDimensionsError)
+		return DimensionsError
 	}
 	for i, x := range n.elements {
 		m.elements[i] -= x
@@ -146,7 +144,7 @@ func (m *Matrix) Sub(n *Matrix) error {
 
 func (m *Matrix) Slice(row, col, rows, cols int) (*Matrix, error) {
 	if row+rows > m.rows || col+cols > m.cols {
-		return new(Matrix), new(MatrixIndexError)
+		return new(Matrix), IndexError
 	}
 	elements := make([]float64, rows*cols)
 	for i := 0; i < rows; i++ {

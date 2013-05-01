@@ -4,14 +4,18 @@ import (
 	"math/rand"
 )
 
+// Contains functions which return new matrices (without modification to the
+// original) or operate on multiple matrices.
+
+// Constructs a new matrix given its elements and dimensions
 func New(elements []float64, rows, cols int) (*Matrix, error) {
 	if len(elements) != rows*cols {
-		return &Matrix{}, &MatrixDimensionsError{}
+		return &Matrix{}, DimensionsError
 	}
 	return &Matrix{elements, rows, cols}, nil
 }
 
-// Create a new matrix and initialize it with normalized random values
+// Constructs a new matrix and initialize it with normalized random values
 func NewRandNorm(stdDev, mean float64, rows, cols int) *Matrix {
 	elements := make([]float64, rows*cols)
 	for i := range elements {
@@ -40,14 +44,14 @@ func NewZeros(rows, cols int) *Matrix {
 	return &Matrix{make([]float64, rows*cols), rows, cols}
 }
 
-type Application func(float64) float64
+type F func(float64) float64
 
-func Map(m *Matrix, fn Application) *Matrix {
+func Map(m *Matrix, fn F) *Matrix {
 	n := NewZeros(m.rows, m.cols)
 	for i, x := range m.elements {
 		n.elements[i] = fn(x)
 	}
-  return n
+	return n
 }
 
 func Transpose(m *Matrix) *Matrix {
@@ -62,7 +66,7 @@ func Transpose(m *Matrix) *Matrix {
 
 func Dot(a *Matrix, b *Matrix) (*Matrix, error) {
 	if a.cols != b.rows {
-		return &Matrix{}, &MatrixDimensionsError{}
+		return &Matrix{}, DimensionsError
 	}
 	c := NewZeros(a.rows, b.cols)
 	for i := 0; i < a.rows; i++ {
@@ -137,38 +141,38 @@ func Greater(m *Matrix, n *Matrix) *Matrix {
 
 func Augment(m *Matrix, n *Matrix) (*Matrix, error) {
 	if m.rows != n.rows {
-		return nil, new(MatrixDimensionsError)
+		return nil, DimensionsError
 	}
-  rows := m.rows
-  cols := m.cols + n.cols
+	rows := m.rows
+	cols := m.cols + n.cols
 	elements := make([]float64, rows*cols)
-  for i := 0; i < rows; i++ {
-    for j := 0; j < cols; j++ {
-      if j < m.cols {
-        elements[i*cols+j] = m.elements[i*m.cols+j]
-      } else {
-        elements[i*cols+j] = n.elements[i*n.cols+(j-m.cols)]
-      }
-    }
-  }
-	return &Matrix{elements,rows,cols}, nil
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+			if j < m.cols {
+				elements[i*cols+j] = m.elements[i*m.cols+j]
+			} else {
+				elements[i*cols+j] = n.elements[i*n.cols+(j-m.cols)]
+			}
+		}
+	}
+	return &Matrix{elements, rows, cols}, nil
 }
 
 func Stack(m *Matrix, n *Matrix) (*Matrix, error) {
 	if m.cols != n.cols {
-		return nil, new(MatrixDimensionsError)
+		return nil, DimensionsError
 	}
-  rows := m.rows + n.rows
-  cols := m.cols
+	rows := m.rows + n.rows
+	cols := m.cols
 	elements := make([]float64, rows*cols)
-  for i := 0; i < rows; i++ {
-    for j := 0; j < cols; j++ {
-      if i < m.rows {
-        elements[i*cols+j] = m.elements[i*m.cols+j]
-      } else {
-        elements[i*cols+j] = n.elements[(i-m.rows)*n.cols+j]
-      }
-    }
-  }
-	return &Matrix{elements,rows,cols}, nil
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+			if i < m.rows {
+				elements[i*cols+j] = m.elements[i*m.cols+j]
+			} else {
+				elements[i*cols+j] = n.elements[(i-m.rows)*n.cols+j]
+			}
+		}
+	}
+	return &Matrix{elements, rows, cols}, nil
 }

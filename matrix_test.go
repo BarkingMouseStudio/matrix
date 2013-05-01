@@ -38,6 +38,17 @@ func TestMatrixNewZeros(t *testing.T) {
 	}
 }
 
+func TestMatrixArray(t *testing.T) {
+	a, err := New([]float64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}, 4, 4)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := New(a.Array(), 4, 4)
+	if !a.Equals(b) {
+		t.Fatal("Returned unexpected results", b)
+	}
+}
+
 func TestMatrixSlice(t *testing.T) {
 	a, err := New([]float64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}, 4, 4)
 	if err != nil {
@@ -69,13 +80,13 @@ func TestMatrixArrays(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-  b := a.Arrays()
+	b := a.Arrays()
 	expected := [][]float64{
-    {1, 2, 3, 4},
-    {5, 6, 7, 8},
-    {9, 10, 11, 12},
-    {13, 14, 15, 16},
-  }
+		{1, 2, 3, 4},
+		{5, 6, 7, 8},
+		{9, 10, 11, 12},
+		{13, 14, 15, 16},
+	}
 	if fmt.Sprintf("%v", b) != fmt.Sprintf("%v", expected) {
 		t.Fatal("Returned unexpected results", b)
 	}
@@ -343,28 +354,6 @@ func TestMatrixPow(t *testing.T) {
 
 	if !a.Equals(expected) {
 		t.Fatal("Returned unexpected results", a)
-	}
-}
-
-func TestMatrixIndexError(t *testing.T) {
-	err := &MatrixIndexError{}
-	msg := "Index out of range"
-	if err.String() != msg {
-		t.Fatal("Got incorrect string message", err.String())
-	}
-	if err.Error() != msg {
-		t.Fatal("Got incorrect string message", err.Error())
-	}
-}
-
-func TestMatrixDimensionsError(t *testing.T) {
-	err := &MatrixDimensionsError{}
-	msg := "Incorrect dimensions"
-	if err.String() != msg {
-		t.Fatal("Got incorrect string message", err.String())
-	}
-	if err.Error() != msg {
-		t.Fatal("Got incorrect string message", err.Error())
 	}
 }
 
