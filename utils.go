@@ -44,6 +44,16 @@ func NewZeros(rows, cols int) *Matrix {
 	return &Matrix{make([]float64, rows*cols), rows, cols}
 }
 
+func Reshape(m *Matrix, rows, cols int) (*Matrix, error) {
+	size := rows * cols
+	if size != m.Size() {
+		return &Matrix{}, DimensionsError
+	}
+	elements := make([]float64, rows*cols)
+	copy(elements, m.elements)
+	return &Matrix{elements, rows, cols}, nil
+}
+
 type F func(float64) float64
 
 func Map(m *Matrix, fn F) *Matrix {

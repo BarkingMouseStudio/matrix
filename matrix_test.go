@@ -43,8 +43,20 @@ func TestMatrixArray(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	b, err := New(a.Array(), 4, 4)
+	b, _ := New(a.Array(), 4, 4)
 	if !a.Equals(b) {
+		t.Fatal("Returned unexpected results", b)
+	}
+}
+
+func TestMatrixReshape(t *testing.T) {
+	a, _ := New([]float64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}, 4, 4)
+	b, err := Reshape(a, 8, 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	c, _ := New([]float64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}, 8, 2)
+	if !b.Equals(c) {
 		t.Fatal("Returned unexpected results", b)
 	}
 }
@@ -431,8 +443,11 @@ func ExampleMatrixStringer() {
 }
 
 func BenchmarkMatrixDot(b *testing.B) {
-	a, _ := New([]float64{1, 2, 3, 4, 5, 6}, 3, 2)
-	c, _ := New([]float64{1, 2, 3, 4, 5, 6}, 2, 3)
+	b.StopTimer()
+	dim := 100
+	a := NewRand(dim, dim)
+	c := NewRand(dim, dim)
+	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		Dot(a, c)
 	}
