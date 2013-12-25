@@ -24,6 +24,28 @@ func TestMatrixNew(t *testing.T) {
 	}
 }
 
+func TestMatrixNewMulti(t *testing.T) {
+	m := NewMulti([][]float64{
+		[]float64{1, 2},
+		[]float64{3, 4},
+		[]float64{5, 6},
+		[]float64{7, 8},
+	})
+	if m.Rows() != 4 {
+		t.Fatal("Matrix returned incorrect cols", m.Rows())
+	}
+	if m.Cols() != 2 {
+		t.Fatal("Matrix returned incorrect cols", m.Cols())
+	}
+	if m.Size() != 8 {
+		t.Fatal("Matrix returned incorrect length")
+	}
+	n, _ := New([]float64{1, 2, 3, 4, 5, 6, 7, 8}, 4, 2)
+	if !m.Equals(n) {
+		t.Fatal("Matrices did not match")
+	}
+}
+
 func TestMatrixNewRandNorm(t *testing.T) {
 	m := NewRandNorm(0.1, 0, 3, 3)
 	if m.Size() != 9 {

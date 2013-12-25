@@ -15,6 +15,18 @@ func New(elements []float64, rows, cols int) (*Matrix, error) {
 	return &Matrix{elements, rows, cols}, nil
 }
 
+func NewMulti(matrix [][]float64) *Matrix {
+	rows := len(matrix)
+	cols := len(matrix[0])
+	elements := make([]float64, rows*cols)
+	var offset int
+	for i, row := range matrix {
+		offset = i * cols
+		copy(elements[offset:offset+cols], row)
+	}
+	return &Matrix{elements, rows, cols}
+}
+
 // Constructs a new matrix and initialize it with normalized random values
 func NewRandNorm(stdDev, mean float64, rows, cols int) *Matrix {
 	elements := make([]float64, rows*cols)
@@ -54,9 +66,9 @@ func Reshape(m *Matrix, rows, cols int) (*Matrix, error) {
 	return &Matrix{elements, rows, cols}, nil
 }
 
-type F func(float64) float64
+type IterFunc func(float64) float64
 
-func Map(m *Matrix, fn F) *Matrix {
+func Map(m *Matrix, fn IterFunc) *Matrix {
 	n := NewZeros(m.rows, m.cols)
 	for i, x := range m.elements {
 		n.elements[i] = fn(x)
