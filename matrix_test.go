@@ -81,6 +81,10 @@ func TestMatrixReshape(t *testing.T) {
 	if !b.Equals(c) {
 		t.Fatal("Returned unexpected results", b)
 	}
+	_, err = Reshape(a, 12, 2)
+	if err == nil {
+		t.Fatal("Expected dimensions error")
+	}
 }
 
 func TestMatrixSlice(t *testing.T) {
