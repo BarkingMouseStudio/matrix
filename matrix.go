@@ -17,12 +17,12 @@ type Matrix struct {
 	rows, cols int
 }
 
-func (m *Matrix) Arrays() (a [][]float64) {
-	a = make([][]float64, m.rows)
+func (m *Matrix) Arrays() [][]float64 {
+	a := make([][]float64, m.rows)
 	for i := 0; i < m.rows; i++ {
 		a[i] = m.elements[i*m.cols : i*m.cols+m.cols]
 	}
-	return
+	return a
 }
 
 func (m *Matrix) Array() []float64 {
@@ -43,6 +43,9 @@ func (m *Matrix) Size() int {
 
 // Implement Stringer interface
 func (m *Matrix) String() string {
+	if m.rows == 0 || m.cols == 0 {
+		return "[]"
+	}
 	out := "["
 	for i := 0; i < m.rows; i++ {
 		if i > 0 {
